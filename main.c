@@ -8,11 +8,13 @@ int main() {
         return 1;
     }
 
-    uint8_t victim_mac[6] = {0x08, 0x00, 0x27, 0xbc, 0x0c, 0x22};
+    uint8_t victim_mac[6];
+    memcpy(victim_mac, VICTEM_MAC_HEX, 6);
     uint8_t victim_ip[4];
     memcpy(victim_ip, CUSTOM_IP_HEX, 4);
 
-    uint8_t router_mac[6] = {0xd4, 0x92, 0x5e, 0xb8, 0x9d, 0xf7};
+    uint8_t router_mac[6];
+    memcpy(router_mac, ROUTER_MAC_HEX, 4);
     uint8_t router_ip[4];
     memcpy(router_ip, ROUTER_IP_HEX, 4);
 
