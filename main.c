@@ -1,8 +1,9 @@
 #include "spoofer.h"
 #include "config.h"
+#include "network_scanner.h"
 
 int main() {
-    int sock_fd = socket(AF_PACKET, SOCK_RAW, htons(ARP_PROTOCOL));
+    int sock_fd = create_raw_socket(ARP_PROTOCOL);
     if (sock_fd == -1) {
         perror("socket");
         return 1;
