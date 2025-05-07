@@ -15,9 +15,9 @@ void build_arp_packet(uint8_t *packet, thread_spoof_args_t *args) {
 	arp.proto_size = 4;
 	arp.opcode = htons(ARP_REPLY);
 	memcpy(arp.sender_mac, args->spoofed_mac, 6);
-	memcpy(arp.sender_ip, args->spoofed_ip, 4);
+	memcpy(&arp.sender_ip, args->spoofed_ip, 4);
 	memcpy(arp.target_mac, args->target_mac, 6);
-	memcpy(arp.target_ip, args->target_ip, 4);
+	memcpy(&arp.target_ip, args->target_ip, 4);
 
 	memcpy(packet, &eth, sizeof(eth));
 	memcpy(packet + sizeof(eth), &arp, sizeof(arp));

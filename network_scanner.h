@@ -10,11 +10,16 @@
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
 
+#include "spoofer.h"
+
 
 #define MACHINE_MAX_NAME_LENGTH 20
 #define MAXIMUM_MACHINES 50
 #define CIDR 24
 #define HOST_BITS 8
+#define ETH_HDR_LEN 14
+#define ARP_HDR_LEN 28
+#define ARP_PACKET_LEN (ETH_HDR_LEN + ARP_HDR_LEN)
 
 #define MAC_BROADCAST (uint8_t[6]){0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 #define FIRST_IP "192.168.1.1"
@@ -24,6 +29,8 @@
 typedef uint8_t mac_addr_t[6];
 
 // General structs
+typedef uint8_t mac_addr_t[6];
+
 typedef struct __attribute__((packed)) {
 	mac_addr_t dest_mac;
 	mac_addr_t src_mac;
@@ -36,32 +43,37 @@ typedef struct __attribute__((packed)) {
 	uint8_t hw_size;
 	uint8_t proto_size;
 	uint16_t opcode;
-	mac_addr_t sender_mac[6];
-	ip_addr_t sender_ip[4];
-	mac_addr_t target_mac[6];
-	ip_addr_t target_ip[4];
+	mac_addr_t sender_mac;
+	uint32_t sender_ip;
+	mac_addr_t target_mac;
+	uint32_t target_ip;
 } arp_header_t;
 
-
 typedef struct __attribute__((packed)) {
-	ethernet_header_t ethernet_header;
-	arp_header_t arp_header;
-}arp_packet_t;
+	ethernet_header_t eth;
+	arp_header_t arp;
+} arp_packet_t;
+
 
 
 // Struct to hold a description for a machine on the network
 typedef struct {
 	char name[MACHINE_MAX_NAME_LENGTH];
 	mac_addr_t mac_addr;
-	ip_addr_t ip_addr;
+	uint32_t ip_addr;
 }host_t;
 
+extern int num_hosts;
+extern host_t* hosts_array;
+
+extern pthread_mutex_t num_hosts_mutex;
+extern pthread_mutex_t hosts_array_mutex;
 
 /** Scan the network for hosts
+ *	Call recv_thread and send_thread
  *
- * @return A pointer to an array of all the hosts on the network
  */
-host_t* scan_network_for_hosts();
+void scan_network_for_hosts();
 
 
 /** Creates a raw socket
@@ -84,6 +96,8 @@ host_t get_router_information();
  * @param ip_addr An IP address
  * @return A crafted arp request packet for a given IP
  */
-arp_packet_t craft_arp_packet_for_ip(ip_addr_t ip_addr);
+void craft_arp_req_for_ip(in_addr_t ip_addr, uint8_t* buf);
+
+int  is_arp_rep(struct ether_arp *arp);
 
 #endif //NETWORK_SCANNER_H
